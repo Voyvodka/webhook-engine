@@ -11,7 +11,6 @@ env:
 jobs:
   docker:
     name: Publish Docker Image
-    if: ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -49,7 +48,6 @@ jobs:
 
   nuget:
     name: Publish NuGet Package
-    if: ${{ secrets.NUGET_API_KEY != '' }}
     runs-on: ubuntu-latest
 
     steps:
