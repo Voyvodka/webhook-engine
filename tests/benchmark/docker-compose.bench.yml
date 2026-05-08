@@ -5,10 +5,7 @@ services:
       - POSTGRES_DB=webhookengine
       - POSTGRES_USER=webhookengine
       - POSTGRES_PASSWORD=webhookengine
-    # Docker's default /dev/shm is 64 MB; parallel COUNT(*) under bench
-    # contention exhausts it once the messages table grows past ~250K rows
-    # ("could not resize shared memory segment"). 1 GB matches what production
-    # postgres deployments commonly carry and keeps the bench numbers honest.
+    # Default 64 MB /dev/shm exhausts under parallel COUNT(*) past ~250K rows.
     shm_size: 1gb
     command: >
       postgres
@@ -51,12 +48,8 @@ services:
       - WebhookEngine__RateLimit__PermitLimit=20000
       - WebhookEngine__RateLimit__TokensPerPeriod=20000
       - WebhookEngine__RateLimit__QueueLimit=5000
-      # The bench receiver lives on the docker bridge network, so its DNS
-      # resolves to an RFC1918 address. The SSRF guard is correct to reject
-      # private IPs in production but would block our self-contained
-      # benchmark target. Disable the guard inside this trusted, isolated
-      # compose stack only — the production default (Enabled=true) is
-      # preserved everywhere else.
+      # Bench receiver is on the docker bridge (RFC1918) — turn off the
+      # production SSRF guard inside this isolated compose only.
       - WebhookEngine__SsrfGuard__Enabled=false
     depends_on:
       postgres:
